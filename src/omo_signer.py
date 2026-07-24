@@ -58,7 +58,7 @@ def _daemon_request(op: str, **kwargs) -> dict:
             s.sendall(header + payload)
             length = int.from_bytes(_recv_exact(s, 4), "big")
             if length > MAX_MESSAGE_SIZE:
-                raise ValueError(f"响应过大: {length} > {MAX_MESSAGE_SIZE}")
+                raise ValueError(f"Response too large: {length} > {MAX_MESSAGE_SIZE}")
             return json.loads(_recv_exact(s, length))
     except (ConnectionRefusedError, socket.timeout) as e:
         print(f"Error: Cannot connect to daemon ({HOST}:{PORT}). Start it with: omo-daemon", file=sys.stderr)
@@ -87,8 +87,8 @@ def generate(agent: str, algo: str, force: bool = False) -> None:
     key_dir.mkdir(parents=True, exist_ok=True)
 
     sk_file = key_dir / prov.private_key_filename
-        if sk_file.exists() and not force:
-            print(f"Error: {agent} already has {algo} key. Use --force to overwrite.", file=sys.stderr)
+    if sk_file.exists() and not force:
+        print(f"Error: {agent} already has {algo} key. Use --force to overwrite.", file=sys.stderr)
         sys.exit(1)
     if force and sk_file.exists():
         # Remove existing key files before generating
@@ -190,12 +190,12 @@ def rotate(agent: str, algo: str = "ed25519") -> None:
     if pub_file.exists():
         backup_name = f"{prov.public_key_filename}.{int(time.time())}"
         pub_file.rename(key_dir / backup_name)
-        print(f"已备份旧公钥: {backup_name}")
+        print(f"Backed up old public key: {backup_name}")
 
     # 生成新密钥（force=True 覆盖旧私钥）
     generate(agent, algo, force=True)
     print(f"Generated new key: {agent} ({algo})")
-    print("提示: 旧公钥已保留，可继续验证历史签名。请重启守护进程使新密钥生效: omo-daemon --stop && omo-daemon --daemon")
+    print("Tip: Old public key preserved for historical verification. Restart daemon for new key: omo-daemon --stop && omo-daemon --daemon")
 
 # ── CLI ──────────────────────────────────────────────────
 def main() -> None:
@@ -235,7 +235,7 @@ def main() -> None:
     sub.add_parser("ping", help="守护进程健康检查")
 
     # rotate
-    p = sub.add_parser("rotate", help="轮换密钥（备份旧公钥，生成新密钥对）")
+    p = sub.add_parser("rotate", help="Rotate key (backup old pubkey, generate new key pair)")
     p.add_argument("agent", help="智能体名称")
     g = p.add_mutually_exclusive_group()
     g.add_argument("--sm2", action="store_true", help="轮换 SM2 密钥")
@@ -257,7 +257,7 @@ def main() -> None:
         verify(args.agent, args.message, args.signature, algo)
     elif args.command == "list":
         agents = [d.name for d in KEYSTORE.iterdir() if d.is_dir()] if KEYSTORE.exists() else []
-        print("\n".join(agents) if agents else "(暂无智能体)")
+        print("\n".join(agents) if agents else "(no agents)")
     elif args.command == "ping":
         try:
             resp = _daemon_request("ping")
