@@ -33,3 +33,4 @@ pip/
 scripts/build_paper.py
 generate_ecdsa.py
 WORKPLAN.md
+output.txt
