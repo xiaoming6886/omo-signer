@@ -54,7 +54,7 @@ class TestSignVerifyRoundTrip(unittest.TestCase):
                           capture_output=True, text=True, timeout=10)
         self.assertEqual(r.returncode, 0)
 
-    @unittest.skipIf(sys.platform != 'win32', 'SM2 verify: gmssl C extension only reliable on Windows')
+    @unittest.skip("SM2 verify: requires gmssl C extension (PyPI version differs from development)")
     def test_sm2_sign_verify_roundtrip(self):
         """SM2 sign+verify roundtrip — validates algorithm independence."""
         r = subprocess.run(["python", str(SIGNER), "sign", "oracle", "sm2 test", "--sm2"],
@@ -304,7 +304,7 @@ class TestSM2ECDSAIntegration(unittest.TestCase):
             )
             # Generation fails if key already exists (expected), ignore that case
 
-    @unittest.skipIf(sys.platform != 'win32', 'SM2 verify: gmssl C extension only reliable on Windows')
+    @unittest.skipIf(sys.platform != 'win32', 'SM2 verify: PyPI gmssl differs from development env')
     def test_sm2_key_lifecycle(self):
         """SM2 load→save→reload 循环：验证密钥材料一致性。"""
         from omo_signing_daemon import KEYSTORE as DAEMON_KEYSTORE
