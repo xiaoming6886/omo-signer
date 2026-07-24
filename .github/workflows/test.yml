@@ -36,6 +36,7 @@ jobs:
           done
           omo-signer generate oracle --sm2
           omo-signer generate oracle --ecdsa
+        shell: bash
 
       - name: Start daemon
         run: |
