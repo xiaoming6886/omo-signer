@@ -31,7 +31,9 @@ jobs:
 
       - name: Generate test keys
         run: |
-          omo-signer generate oracle
+          for agent in sisyphus prometheus hephaestus atlas oracle metis momus; do
+            omo-signer generate $agent
+          done
           omo-signer generate oracle --sm2
           omo-signer generate oracle --ecdsa
 
