@@ -582,9 +582,9 @@ def main() -> None:
         vault.load()
         valid, detail = verify_audit_chain()
         if not valid:
-            print(f"[WARN] 审计链验证失败: {detail}", file=sys.stderr)
+            print(f"[WARN] Audit chain verification failed: {detail}", file=sys.stderr)
         else:
-            print(f"[AUDIT] 链完整性: {detail}")
+            print(f"[AUDIT] Chain integrity: {detail}")
         run_server(vault)
 
 if __name__ == "__main__":

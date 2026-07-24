@@ -61,7 +61,7 @@ def _daemon_request(op: str, **kwargs) -> dict:
                 raise ValueError(f"响应过大: {length} > {MAX_MESSAGE_SIZE}")
             return json.loads(_recv_exact(s, length))
     except (ConnectionRefusedError, socket.timeout) as e:
-        print(f"错误: 无法连接守护进程 ({HOST}:{PORT})。请先启动: omo-daemon", file=sys.stderr)
+        print(f"Error: Cannot connect to daemon ({HOST}:{PORT}). Start it with: omo-daemon", file=sys.stderr)
         sys.exit(1)
 
 def _recv_exact(sock: socket.socket, n: int) -> bytes:
@@ -87,8 +87,8 @@ def generate(agent: str, algo: str, force: bool = False) -> None:
     key_dir.mkdir(parents=True, exist_ok=True)
 
     sk_file = key_dir / prov.private_key_filename
-    if sk_file.exists() and not force:
-        print(f"错误: {agent} 已有 {algo} 密钥。使用 --force 强制覆盖", file=sys.stderr)
+        if sk_file.exists() and not force:
+            print(f"Error: {agent} already has {algo} key. Use --force to overwrite.", file=sys.stderr)
         sys.exit(1)
     if force and sk_file.exists():
         # Remove existing key files before generating
@@ -99,7 +99,7 @@ def generate(agent: str, algo: str, force: bool = False) -> None:
 
     prov.generate(key_dir)
     _ensure_token(key_dir)
-    print(f"已生成 {agent} ({algo})")
+    print(f"Generated {agent} ({algo})")
 
 # ── 签名与验证 ───────────────────────────────────────────
 def sign(agent: str, message: str, algo: str) -> None:
@@ -111,7 +111,7 @@ def sign(agent: str, message: str, algo: str) -> None:
     if resp.get("status") == "ok":
         print(resp["signature"])
     else:
-        print(f"签名失败: {resp.get('reason', '未知错误')}", file=sys.stderr)
+        print(f"Sign failed: {resp.get('reason', 'unknown error')}", file=sys.stderr)
         sys.exit(1)
 
 def verify(agent: str, message: str, signature: str, algo: str) -> None:
@@ -194,7 +194,7 @@ def rotate(agent: str, algo: str = "ed25519") -> None:
 
     # 生成新密钥（force=True 覆盖旧私钥）
     generate(agent, algo, force=True)
-    print(f"已生成新密钥: {agent} ({algo})")
+    print(f"Generated new key: {agent} ({algo})")
     print("提示: 旧公钥已保留，可继续验证历史签名。请重启守护进程使新密钥生效: omo-daemon --stop && omo-daemon --daemon")
 
 # ── CLI ──────────────────────────────────────────────────
@@ -249,7 +249,7 @@ def main() -> None:
     elif args.command == "sign":
         msg = sys.stdin.read().strip() if args.stdin else args.message
         if not msg:
-            print("错误: 消息不能为空", file=sys.stderr); sys.exit(1)
+            print("Error: message cannot be empty", file=sys.stderr); sys.exit(1)
         algo = "sm2" if args.sm2 else "ecdsa" if args.ecdsa else "ed25519"
         sign(args.agent, msg, algo)
     elif args.command == "verify":
