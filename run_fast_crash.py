@@ -25,7 +25,7 @@ for i in range(30):
 
 recovered = sum(results)
 print(f"\n=== RESULT ===")
-print(f"Recovery: {recovered}/30 (100% 密钥连续性)")
+print(f"Recovery: {recovered}/30 (100% key continuity)")
 
 # Write to file
 with open("fast_crash_result.txt", "w", encoding="utf-8") as f:

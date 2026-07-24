@@ -17,7 +17,6 @@ dist/
 build/
 *.egg-info/
 state/
-test_one_crash.py
 run_test.ps1
 run_crash.py
 run_extra_tests.py
