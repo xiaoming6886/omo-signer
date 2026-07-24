@@ -205,7 +205,7 @@ class SM2Provider(SigningProvider):
         # Derive public key: P = d * G (gmssl _kg returns hex string of x+y)
         sm2 = gmssl_sm2.CryptSM2(public_key="", private_key=sk_hex)
         G = sm2.ecc_table['g']
-        pk_hex = sm2._kg(int(sk_hex, 16), G)
+        pk_hex = sm2._kg(int(sk_hex, 16), G).zfill(128)
         sk_file.write_text(sk_hex, encoding="ascii")
         pk_file.write_text(pk_hex, encoding="ascii")
 
@@ -230,7 +230,7 @@ class SM2Provider(SigningProvider):
         # Derive public key from private key: P = d * G
         sm2 = gmssl_sm2.CryptSM2(public_key="", private_key=key_obj)
         G = sm2.ecc_table['g']
-        actual = sm2._kg(int(key_obj, 16), G)
+        actual = sm2._kg(int(key_obj, 16), G).zfill(128)
         if expected != actual:
             raise ValueError(
                 f"SM2 key mismatch for '{key_dir.name}': "
