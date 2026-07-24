@@ -1,0 +1,77 @@
+name: Test Suite
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Python ${{ matrix.python }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python: ["3.10", "3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Install dependencies
+        run: |
+          pip install -e .
+          pip install pytest
+
+      - name: Generate test keys
+        run: |
+          omo-signer generate oracle
+          omo-signer generate oracle --sm2
+          omo-signer generate oracle --ecdsa
+
+      - name: Start daemon
+        run: |
+          omo-daemon --daemon
+          sleep 3
+        shell: bash
+
+      - name: Run tests
+        run: python -m pytest tests/ -v --tb=short
+
+      - name: Stop daemon
+        run: omo-daemon --stop
+        if: always()
+
+  crash-test:
+    name: Crash Recovery on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -e .
+
+      - name: Generate test keys
+        run: |
+          omo-signer generate oracle
+          omo-signer generate oracle --sm2
+          omo-signer generate oracle --ecdsa
+
+      - name: Run crash recovery test (fast)
+        run: python run_fast_crash.py

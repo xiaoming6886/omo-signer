@@ -1,0 +1,22 @@
+# OMO Signer — Docker Compose 部署
+version: "3.8"
+
+services:
+  omo-daemon:
+    build: .
+    container_name: omo-signer
+    restart: unless-stopped
+    ports:
+      - "45987:45987"
+    volumes:
+      - omo_state:/home/omo/.local/state
+    environment:
+      - OMO_SIGNER_PORT=45987
+    healthcheck:
+      test: ["CMD", "omo-signer", "ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  omo_state:

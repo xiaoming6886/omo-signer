@@ -1,0 +1,19 @@
+# OMO Signer Configuration Template
+# Copy to config.yaml and customize
+
+agents:
+  - agent-1    # Replace with your agent names
+  - agent-2
+  - agent-3
+
+daemon:
+  host: 127.0.0.1
+  port: 45987
+  max_message_size: 10485760
+
+security:
+  algorithm: ed25519            # ed25519 | sm2 | ecdsa
+  token_auth: true
+  shutdown_token: true
+  nonce_anti_replay: true
+  audit_log: true

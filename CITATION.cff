@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+message: "如果本仓库对你的研究有帮助，请引用以下论文。"
+title: "面向 LLM 多智能体通信的签名认证架构"
+authors:
+  - family-names: "郝"
+    given-names: "禹铭"
+journal: "网络与信息安全学报"
+year: 2026
+note: "审稿中"
+repository-code: "https://github.com/xiaoming6886/omo-signer"
+url: "https://github.com/xiaoming6886/omo-signer"
+license: MIT
